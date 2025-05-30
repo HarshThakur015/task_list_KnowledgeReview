@@ -32,7 +32,7 @@ mongoose.connect(process.env.MONGODB_URI)
 app.get('/tasks', async (req, res) => {
     console.log('Fetching tasks...');
     try {
-        const tasks = await Task.find().sort({ createdAt: -1 }); // Sort by newest first
+        const tasks = await Task.find().sort({ createdAt: -1 }); 
         res.json(tasks);
     } catch (err) {
         console.error('Error fetching tasks:', err);
@@ -40,6 +40,18 @@ app.get('/tasks', async (req, res) => {
     }
 });
 
-
-// Write an endpoint to create a new task.
+app.post('/tasks', async (req, res) => {
+    const { title, dueDate, priority, status } = req.body;
+    if (!title || !dueDate || !priority || !status) {
+        return res.status(400).json({ message: 'All fields are required.' });
+    }
+    try {
+        const newTask = new Task({ title, dueDate, priority, status });
+        await newTask.save();
+        res.status(201).json(newTask);
+    } catch (err) {
+        console.error('Error creating task:', err);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
 
